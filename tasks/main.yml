@@ -16,7 +16,7 @@
 - name: install repository
   become: yes
   apt_repository: 
-    repo: deb http://download.virtualbox.org/virtualbox/debian xenial contrib
+    repo: deb http://download.virtualbox.org/virtualbox/debian {{ distribution }} contrib
     state: present
     update_cache: yes
 
@@ -24,31 +24,31 @@
   become: yes
   apt: pkg=virtualbox-5.1 state=present
 
-- name: check if extension pack is already installed
-  shell: VBoxManage list extpacks
-  register: extpack_list
-  changed_when: 'extpack_list.stdout == "Extension Packs: 0"'
+# - name: check if extension pack is already installed
+#   shell: VBoxManage list extpacks
+#   register: extpack_list
+#   changed_when: 'extpack_list.stdout == "Extension Packs: 0"'
 
-- name: detect version
-  shell: |
-    version=$(VBoxManage -v)
-    var1=$(echo $version | cut -d 'r' -f 1)
-    var2=$(echo $version | cut -d 'r' -f 2)
-    echo $var1
-    echo $var2
-  register: virtualbox_version
-  when: 'extpack_list.stdout == "Extension Packs: 0"'
+# - name: detect version
+#   shell: |
+#     version=$(VBoxManage -v)
+#     var1=$(echo $version | cut -d 'r' -f 1)
+#     var2=$(echo $version | cut -d 'r' -f 2)
+#     echo $var1
+#     echo $var2
+#   register: virtualbox_version
+#   when: 'extpack_list.stdout == "Extension Packs: 0"'
 
-- debug:  var=virtualbox_version.stdout_lines
-  when: 'extpack_list.stdout == "Extension Packs: 0"'
+# - debug:  var=virtualbox_version.stdout_lines
+#   when: 'extpack_list.stdout == "Extension Packs: 0"'
 
-- name: download VirtualBox extension pack
-  get_url:
-    url: http://download.virtualbox.org/virtualbox/{{ virtualbox_version.stdout_lines.0 }}/Oracle_VM_VirtualBox_Extension_Pack-{{ virtualbox_version.stdout_lines.0 }}-{{ virtualbox_version.stdout_lines.1 }}.vbox-extpack
-    dest: /tmp/Oracle_VM_VirtualBox_Extension_Pack-{{ virtualbox_version.stdout_lines.0 }}-{{ virtualbox_version.stdout_lines.1 }}.vbox-extpack
-  when: 'extpack_list.stdout == "Extension Packs: 0"'
+# - name: download VirtualBox extension pack
+#   get_url:
+#     url: http://download.virtualbox.org/virtualbox/{{ virtualbox_version.stdout_lines.0 }}/Oracle_VM_VirtualBox_Extension_Pack-{{ virtualbox_version.stdout_lines.0 }}-{{ virtualbox_version.stdout_lines.1 }}.vbox-extpack
+#     dest: /tmp/Oracle_VM_VirtualBox_Extension_Pack-{{ virtualbox_version.stdout_lines.0 }}-{{ virtualbox_version.stdout_lines.1 }}.vbox-extpack
+#   when: 'extpack_list.stdout == "Extension Packs: 0"'
 
-- name: Install VirtualBox extension pack
-  become: yes
-  shell: VBoxManage extpack install --replace /tmp/Oracle_VM_VirtualBox_Extension_Pack-{{ virtualbox_version.stdout_lines.0 }}-{{ virtualbox_version.stdout_lines.1 }}.vbox-extpack
-  when: 'extpack_list.stdout == "Extension Packs: 0"'
+# - name: Install VirtualBox extension pack
+#   become: yes
+#   shell: VBoxManage extpack install --replace /tmp/Oracle_VM_VirtualBox_Extension_Pack-{{ virtualbox_version.stdout_lines.0 }}-{{ virtualbox_version.stdout_lines.1 }}.vbox-extpack
+#   when: 'extpack_list.stdout == "Extension Packs: 0"'
